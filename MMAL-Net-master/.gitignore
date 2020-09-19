@@ -5,4 +5,5 @@ models/*.pth
 *.DS_Store
 *__init__.py
 *__pycache__
+weimin_debug.py
 

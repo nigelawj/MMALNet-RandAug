@@ -21,6 +21,16 @@ def read_dataset(input_size, batch_size, root, set):
         testset = dataset.STANFORD_CAR(input_size=input_size, root=root, is_train=False)
         testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
                                                  shuffle=False, num_workers=8, drop_last=False)
+    
+    elif set == 'CompCars':
+        print('Loading CompCars trainset')
+        trainset = dataset.CompCars(input_size=input_size, root=root, is_train=True)
+        trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
+                                                  shuffle=True, num_workers=8, drop_last=False)
+        print('Loading CompCars testset')
+        testset = dataset.CompCars(input_size=input_size, root=root, is_train=False)
+        testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
+                                                 shuffle=False, num_workers=8, drop_last=False)
     elif set == 'Aircraft':
         print('Loading Aircraft trainset')
         trainset = dataset.FGVC_aircraft(input_size=input_size, root=root, is_train=True)

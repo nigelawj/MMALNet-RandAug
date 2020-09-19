@@ -22,6 +22,11 @@ if set == 'CUB':
     # model path
     pth_path = "./models/cub_epoch144.pth"
     num_classes = 200
+elif set == 'CompCars':
+    root = './datasets/CompCars'  # dataset path
+    # model path
+    pth_path = "./models/air_epoch146.pth" #### remember to change 
+    num_classes = 75
 elif set == 'Aircraft':
     root = './datasets/FGVC-aircraft'  # dataset path
     # model path
