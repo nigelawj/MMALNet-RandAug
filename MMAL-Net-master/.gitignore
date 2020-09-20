@@ -7,3 +7,4 @@ models/*.pth
 *__pycache__
 weimin_debug.py
 
+checkpoint/

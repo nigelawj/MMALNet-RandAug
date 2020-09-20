@@ -14,7 +14,7 @@ def ComputeCoordinate(image_size, stride, indice, ratio):
         x_lefttop = 0
     if y_lefttop < 0:
         y_lefttop = 0
-    coordinate = np.array((x_lefttop, y_lefttop, x_rightlow, y_rightlow)).reshape(1, 4)
+    coordinate = np.array((x_lefttop, y_lefttop, x_rightlow, y_rightlow), dtype=object).reshape(1, 4)
 
     return coordinate
 

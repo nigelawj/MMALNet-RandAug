@@ -71,7 +71,7 @@ class APPM(nn.Module):
             proposalN_indices.append(np.concatenate(indices_results, 1))   # reverse
 
         proposalN_indices = np.array(proposalN_indices).reshape(batch, proposalN)
-        proposalN_indices = torch.from_numpy(proposalN_indices).to(DEVICE)
+        proposalN_indices = torch.from_numpy(proposalN_indices).long().to(DEVICE)
         proposalN_windows_scores = torch.cat(
             [torch.index_select(all_score, dim=0, index=proposalN_indices[i]) for i, all_score in enumerate(all_scores)], 0).reshape(
             batch, proposalN)

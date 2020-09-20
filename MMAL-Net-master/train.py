@@ -9,7 +9,7 @@ from config import num_classes, model_name, model_path, lr_milestones, lr_decay_
     proposalN, set, channels
 from utils.train_model import train
 from utils.read_dataset import read_dataset
-from utils.auto_laod_resume import auto_load_resume
+from utils.auto_load_resume import auto_load_resume
 from networks.model import MainNet
 
 import os

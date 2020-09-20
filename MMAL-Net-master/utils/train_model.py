@@ -20,7 +20,7 @@ def train(model,
     for epoch in range(start_epoch + 1, end_epoch + 1):
         model.train()
 
-        print('Training %d epoch' % epoch)
+        print('Epoch: %d' % epoch)
 
         lr = next(iter(optimizer.param_groups))['lr']
 

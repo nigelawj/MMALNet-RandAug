@@ -5,7 +5,7 @@ import sys
 from tqdm import tqdm
 from config import input_size, root, proposalN, channels
 from utils.read_dataset import read_dataset
-from utils.auto_laod_resume import auto_load_resume
+from utils.auto_load_resume import auto_load_resume
 from networks.model import MainNet
 
 import os
@@ -25,7 +25,7 @@ if set == 'CUB':
 elif set == 'CompCars':
     root = './datasets/CompCars'  # dataset path
     # model path
-    pth_path = "./models/air_epoch146.pth" #### remember to change 
+    pth_path = "./models/compcars.pth" #### remember to change 
     num_classes = 75
 elif set == 'Aircraft':
     root = './datasets/FGVC-aircraft'  # dataset path

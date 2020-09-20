@@ -28,7 +28,7 @@ def AOLM(fms, fm1):
         prop = measure.regionprops(intersection.astype(int))
         if len(prop) == 0:
             bbox = [0, 0, 14, 14]
-            print('there is one img no intersection')
+            print('\nthere is one img no intersection\n')
         else:
             bbox = prop[0].bbox
 

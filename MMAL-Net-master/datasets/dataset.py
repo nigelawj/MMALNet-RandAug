@@ -5,6 +5,8 @@ from PIL import Image
 from torchvision import transforms
 import torch
 
+import pandas as pd
+
 class CUB():
     def __init__(self, input_size, root, is_train=True, data_len=None):
         self.input_size = input_size
@@ -202,16 +204,20 @@ class CompCars():
         self.input_size = input_size
         self.root = root
         self.is_train = is_train
-        train_img_path = os.path.join(self.root, 'images')
-        test_img_path = os.path.join(self.root, 'images')
-        train_label_file = open(os.path.join(self.root, 'train.txt'))
-        test_label_file = open(os.path.join(self.root, 'test.txt'))
+        train_img_path = os.path.join(self.root)
+        test_img_path = os.path.join(self.root)
+
+        df = pd.read_csv(f"{self.root}/data.csv")
+        train_label_df = df[df["train"] == True].reset_index(drop=True)
+        test_label_df = df[df["train"] == False].reset_index(drop=True)
         train_img_label = []
         test_img_label = []
-        for line in train_label_file:
-            train_img_label.append([os.path.join(train_img_path,line[:-1].split(' ')[0]), int(line[:-1].split(' ')[1])-1])
-        for line in test_label_file:
-            test_img_label.append([os.path.join(test_img_path,line[:-1].split(' ')[0]), int(line[:-1].split(' ')[1])-1])
+
+        for i in train_label_df.index:
+            train_img_label.append([os.path.join(train_img_path, train_label_df['img_path'][i]), int(train_label_df['make_code'][i])]) # make_code [0, 74]
+        for i in test_label_df.index:
+            test_img_label.append([os.path.join(train_img_path, train_label_df['img_path'][i]), int(train_label_df['make_code'][i])])
+
         self.train_img_label = train_img_label[:data_len]
         self.test_img_label = test_img_label[:data_len]
 
