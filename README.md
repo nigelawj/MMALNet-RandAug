@@ -17,5 +17,7 @@ The experiment is performed on the CompCars dataset.
 - Install Tensorboard: `conda install tensorboardx -c conda-forge` 
 - Install OpenCV: `conda install opencv`
 6. Run `python train.py` to commence training
+- Remember to set eval_trainset = True in `config.py`
 - During training, the log file and checkpoint file will be saved in model_path directory
 7. Run `python test.py` to test the model
+- Remember to change `pth_path` of your saved model in `test.py`
