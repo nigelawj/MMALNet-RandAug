@@ -8,11 +8,11 @@ CUDA_VISIBLE_DEVICES = '0'  # The current version only supports one GPU training
 set = 'CompCars'  # Different dataset with different
 model_name = ''
 
-batch_size = 1
+batch_size = 6
 vis_num = batch_size  # The number of visualized images in tensorboard
 eval_trainset = False  # Whether or not evaluate trainset
 save_interval = 1
-max_checkpoint_num = 200
+max_checkpoint_num = 5
 end_epoch = 200
 init_lr = 0.001
 lr_milestones = [60, 100]

@@ -52,7 +52,7 @@ def train(model,
 
         scheduler.step()
 
-        # evaluation every epoch
+        # code to obtain training accuracy after every epoch; eval mode is set and the losses are printed out
         if eval_trainset:
             raw_loss_avg, windowscls_loss_avg, total_loss_avg, raw_accuracy, local_accuracy, local_loss_avg\
                 = eval(model, trainloader, criterion, 'train', save_path, epoch)
@@ -63,7 +63,6 @@ def train(model,
 
             # tensorboard
             with SummaryWriter(log_dir=os.path.join(save_path, 'log'), comment='train') as writer:
-
                 writer.add_scalar('Train/learning rate', lr, epoch)
                 writer.add_scalar('Train/raw_accuracy', raw_accuracy, epoch)
                 writer.add_scalar('Train/local_accuracy', local_accuracy, epoch)

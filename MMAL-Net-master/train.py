@@ -17,9 +17,8 @@ import os
 os.environ['CUDA_VISIBLE_DEVICES'] = CUDA_VISIBLE_DEVICES
 
 def main():
-
     #加载数据
-    trainloader, testloader = read_dataset(input_size, batch_size, root, set)
+    trainloader, testloader = read_dataset(input_size, batch_size, root, set, 'train')
     #image will be resize to the input_size
     #batch size means the number of images the nn process before updating the weight and biases 
     #root is the root to the dataset
@@ -57,16 +56,18 @@ def main():
     shutil.copy('./config.py', os.path.join(save_path, "{}config.py".format(time_str)))
 
     # 开始训练
-    train(model=model,
-          trainloader=trainloader,
-          testloader=testloader,
-          criterion=criterion,
-          optimizer=optimizer,
-          scheduler=scheduler,
-          save_path=save_path,
-          start_epoch=start_epoch,
-          end_epoch=end_epoch,
-          save_interval=save_interval)
+    train(
+        model=model,
+        trainloader=trainloader,
+        testloader=testloader,
+        criterion=criterion,
+        optimizer=optimizer,
+        scheduler=scheduler,
+        save_path=save_path,
+        start_epoch=start_epoch,
+        end_epoch=end_epoch,
+        save_interval=save_interval
+    )
 
 
 if __name__ == '__main__':

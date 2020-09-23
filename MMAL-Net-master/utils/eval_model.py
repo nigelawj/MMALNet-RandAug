@@ -9,7 +9,9 @@ from utils.vis import image_with_boxes
 
 def eval(model, testloader, criterion, status, save_path, epoch):
     model.eval()
-    print('Evaluating')
+    print(f'\nEvaluating on {status} set')
+    if status == 'train':
+        print('NOTE: evaluation on train set in this context simply means to run eval mode on the training set to obtain more performance metrics which were not obtained during the training; this is by design of the authors of this model.')
 
     raw_loss_sum = 0
     local_loss_sum = 0
