@@ -2,7 +2,7 @@ import torch
 import os
 from datasets import dataset
 
-def read_dataset(input_size, batch_size, root, set, status):
+def read_dataset(input_size, batch_size, root, set):
     if set == 'CUB':
         print('Loading CUB trainset')
         trainset = dataset.CUB(input_size=input_size, root=root, is_train=True)
@@ -24,18 +24,14 @@ def read_dataset(input_size, batch_size, root, set, status):
     
     elif set == 'CompCars':
         print('Loading CompCars trainset')
-        trainset = dataset.CompCars(input_size=input_size, root=root, is_train=True, is_val=False)
+        trainset = dataset.CompCars(input_size=input_size, root=root, is_train=True)
         print(f'Size of trainset: {len(trainset)}')
         trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
                                                   shuffle=True, num_workers=8, drop_last=False)
-        if status == 'train':
-            print('Loading CompCars valset') # NOTE: for train.py, this is the validation set, for consistency of code we leave the variable name as test
-            testset = dataset.CompCars(input_size=input_size, root=root, is_train=False, is_val=True)
-            print(f'Size of valset: {len(testset)}')
-        elif status == 'test':
-            print('Loading CompCars testset') # NOTE: now test.py is run, load the actual test set
-            testset = dataset.CompCars(input_size=input_size, root=root, is_train=False, is_val=False)
-            print(f'Size of testset: {len(testset)}')
+
+        print('Loading CompCars testset') # NOTE: now test.py is run, load the actual test set
+        testset = dataset.CompCars(input_size=input_size, root=root, is_train=False)
+        print(f'Size of testset: {len(testset)}')
         testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
                                                  shuffle=False, num_workers=8, drop_last=False)
 
@@ -52,4 +48,4 @@ def read_dataset(input_size, batch_size, root, set, status):
         print('Please choose supported dataset')
         os._exit()
 
-    return trainloader, testloader
+    return trainset, trainloader, testset, testloader

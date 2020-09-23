@@ -201,23 +201,15 @@ class FGVC_aircraft():
             return len(self.test_img_label)
 
 class CompCars():
-    def __init__(self, input_size, root, is_train=True, is_val=False, data_len=None):
+    def __init__(self, input_size, root, is_train=True, data_len=100):
         self.input_size = input_size
         self.root = root
         self.is_train = is_train
         img_path = os.path.join(self.root)
 
         df = pd.read_csv(f"{self.root}/data.csv")
-        # If train.py is run, treat test set as validation set; else if test.py is run, then we load the 'real' test set
-        if (is_val):
-            # NOTE: split train into train/val set; but for consistency of code we'll leave the variable names as 'test' instead of 'val'
-            train_label_df = df[df["train"] == True].reset_index(drop=True)
-            end = int(0.8*len(train_label_df))
-            test_label_df = train_label_df[end:]
-            train_label_df = train_label_df[:end]
-        else:
-            train_label_df = df[df["train"] == True].reset_index(drop=True)
-            test_label_df = df[df["train"] == False].reset_index(drop=True)
+        train_label_df = df[df["train"] == True].reset_index(drop=True)
+        test_label_df = df[df["train"] == False].reset_index(drop=True)
 
         train_img_label = []
         test_img_label = []
@@ -246,7 +238,7 @@ class CompCars():
             img = transforms.ToTensor()(img)
             img = transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])(img)
 
-        else: # if valset or real testset
+        else:
             img, target = imageio.imread(self.test_img_label[index][0]), self.test_img_label[index][1]
             if len(img.shape) == 2:
                 img = np.stack([img] * 3, 2)

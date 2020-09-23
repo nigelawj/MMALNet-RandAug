@@ -37,7 +37,7 @@ def main():
     batch_size = 10
 
     #load dataset
-    _, testloader = read_dataset(input_size, batch_size, root, set, 'test')
+    _, _, _, testloader = read_dataset(input_size, batch_size, root, set)
 
     # 定义模型
     model = MainNet(proposalN=proposalN, num_classes=num_classes, channels=channels)

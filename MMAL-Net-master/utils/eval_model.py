@@ -28,7 +28,7 @@ def eval(model, testloader, criterion, status, save_path, epoch):
             else:
                 images, labels = data
             images = images.cuda()
-            labels = labels.cuda()
+            labels = labels.long().cuda()
 
             proposalN_windows_score,proposalN_windows_logits, indices, \
             window_scores, coordinates, raw_logits, local_logits, local_imgs = model(images, epoch, i, status)

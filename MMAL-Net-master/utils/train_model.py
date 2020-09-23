@@ -29,7 +29,7 @@ def train(model,
                 images, labels, _, _ = data
             else:
                 images, labels = data
-            images, labels = images.cuda(), labels.cuda()
+            images, labels = images.cuda(), labels.long().cuda()
 
             optimizer.zero_grad()
 
@@ -72,6 +72,7 @@ def train(model,
                 writer.add_scalar('Train/total_loss_avg', total_loss_avg, epoch)
 
         # eval testset
+        print('\nFriendly reminder that \'test\' set in this case means val set. The real test set is unused and only used in test.py')
         raw_loss_avg, windowscls_loss_avg, total_loss_avg, raw_accuracy, local_accuracy, \
         local_loss_avg\
             = eval(model, testloader, criterion, 'test', save_path, epoch)

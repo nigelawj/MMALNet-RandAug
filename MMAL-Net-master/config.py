@@ -25,7 +25,6 @@ input_size = 448
 # The pth path of pretrained model
 pretrain_path = './models/pretrained/resnet50-19c8e357.pth'
 
-
 if set == 'CUB':
     model_path = './checkpoint/cub'  # pth save path
     root = './datasets/CUB_200_2011'  # dataset path
