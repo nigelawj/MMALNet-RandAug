@@ -10,7 +10,7 @@ model_name = ''
 
 batch_size = 6
 vis_num = batch_size  # The number of visualized images in tensorboard
-eval_trainset = False  # Whether or not evaluate trainset
+eval_trainset = True  # Set true to get train accs
 save_interval = 1
 max_checkpoint_num = 5
 end_epoch = 200
@@ -21,6 +21,8 @@ weight_decay = 1e-4
 stride = 32
 channels = 2048
 input_size = 448
+
+patience = 4
 
 # The pth path of pretrained model
 pretrain_path = './models/pretrained/resnet50-19c8e357.pth'

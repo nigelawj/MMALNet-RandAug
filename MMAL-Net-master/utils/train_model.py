@@ -3,7 +3,7 @@ import glob
 import torch
 from tqdm import tqdm
 from tensorboardX import SummaryWriter
-from config import max_checkpoint_num, proposalN, eval_trainset, set
+from config import max_checkpoint_num, proposalN, eval_trainset, set, patience
 from utils.eval_model import eval
 
 def train(model,
@@ -16,6 +16,9 @@ def train(model,
           start_epoch,
           end_epoch,
           save_interval):
+
+    best_acc_so_far = 0 # local_accuracy
+    es_counter = 0
 
     for epoch in range(start_epoch + 1, end_epoch + 1):
         model.train()
@@ -90,14 +93,30 @@ def train(model,
             writer.add_scalar('Test/windowscls_loss_avg', windowscls_loss_avg, epoch)
             writer.add_scalar('Test/total_loss_avg', total_loss_avg, epoch)
 
-        # save checkpoint
-        if (epoch % save_interval == 0) or (epoch == end_epoch):
-            print('Saving checkpoint')
-            torch.save({
-                'epoch': epoch,
-                'model_state_dict': model.state_dict(),
-                'learning_rate': lr,
-            }, os.path.join(save_path, 'epoch' + str(epoch) + '.pth'))
+        if (patience == 0):
+            pass
+        else:
+            # save checkpoint only if its the best model so far
+            # if (epoch % save_interval == 0) or (epoch == end_epoch):
+            if (local_accuracy > best_acc_so_far):
+                # if acc is the best so far, update
+                best_acc_so_far = local_accuracy
+                es_counter = 0
+
+                # save checkpoint model
+                print('Saving checkpoint')
+                torch.save({
+                    'epoch': epoch,
+                    'model_state_dict': model.state_dict(),
+                    'learning_rate': lr,
+                }, os.path.join(save_path, 'epoch' + str(epoch) + '.pth'))
+
+            else:
+                es_counter += 1
+            
+            if (es_counter > patience):
+                print(f'Early Stopping at epoch {epoch}.\n')
+                break
 
         # Limit the number of checkpoints to less than or equal to max_checkpoint_num,
         # and delete the redundant ones
@@ -106,4 +125,3 @@ def train(model,
             idx_list = [int(name.replace('epoch', '').replace('.pth', '')) for name in checkpoint_list]
             min_idx = min(idx_list)
             os.remove(os.path.join(save_path, 'epoch' + str(min_idx) + '.pth'))
-

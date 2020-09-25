@@ -110,6 +110,8 @@ def main():
             save_interval=save_interval
         )
 
+        print(f'\n=============== End of fold {fold} ==================\n')
+
 
 if __name__ == '__main__':
     main()
