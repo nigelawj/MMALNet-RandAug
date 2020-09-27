@@ -38,13 +38,14 @@ def main():
 
     #加载checkpoint
     save_path = os.path.join(model_path, model_name)
-    if os.path.exists(save_path):
-        start_epoch, lr = auto_load_resume(model, save_path, status='train')
-        assert start_epoch < end_epoch
-    else:
-        os.makedirs(save_path)
-        start_epoch = 0
-        lr = init_lr
+    # We will not use loading of checkpoint for CompCars k-folds
+    # if os.path.exists(save_path):
+    #     start_epoch, lr = auto_load_resume(model, save_path, status='train')
+    #     assert start_epoch < end_epoch
+    # else:
+    #     os.makedirs(save_path)
+    #     start_epoch = 0
+    #     lr = init_lr
 
     # define optimizers
     optimizer = torch.optim.SGD(parameters, lr=lr, momentum=0.9, weight_decay=weight_decay)
@@ -72,7 +73,10 @@ def main():
     skf = StratifiedKFold(n_splits=5, random_state=42, shuffle=True)
 
     for fold, (train_index, val_index) in enumerate(skf.split(X_train, y_train)):
-        print(f'\n=============== Fold {fold} ==================')
+        print(f'\n=============== Fold {fold+1} ==================')
+        # Prepare save_path for the fold
+        save_path_fold = os.path.join(save_path, str(f'fold_{fold+1}'))
+
         # Split trainloader into train and val loaders
         X_train_fold = X_train[train_index]
         X_val_fold = X_train[val_index]
@@ -104,13 +108,13 @@ def main():
             criterion=criterion,
             optimizer=optimizer,
             scheduler=scheduler,
-            save_path=save_path,
+            save_path=save_path_fold,
             start_epoch=start_epoch,
             end_epoch=end_epoch,
             save_interval=save_interval
         )
 
-        print(f'\n=============== End of fold {fold} ==================\n')
+        print(f'\n=============== End of fold {fold+1} ==================\n')
 
 
 if __name__ == '__main__':

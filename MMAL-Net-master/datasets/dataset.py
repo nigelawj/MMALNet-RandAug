@@ -6,7 +6,7 @@ from torchvision import transforms
 import torch
 
 import pandas as pd
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 
 class CUB():
     def __init__(self, input_size, root, is_train=True, data_len=None):
@@ -215,9 +215,9 @@ class CompCars():
         test_img_label = []
 
         for i in train_label_df.index:
-            train_img_label.append([Path(img_path, train_label_df['img_path'][i]), int(train_label_df['make_code'][i])]) # make_code [0, 74]
+            train_img_label.append([Path(img_path, PureWindowsPath(train_label_df['img_path'][i])), int(train_label_df['make_code'][i])]) # make_code [0, 74]
         for i in test_label_df.index:
-            test_img_label.append([Path(img_path, test_label_df['img_path'][i]), int(test_label_df['make_code'][i])])
+            test_img_label.append([Path(img_path, PureWindowsPath(test_label_df['img_path'][i])), int(test_label_df['make_code'][i])])
 
         self.train_img_label = train_img_label[:data_len]
         self.test_img_label = test_img_label[:data_len]

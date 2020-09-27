@@ -100,7 +100,7 @@ def train(model,
             # if (epoch % save_interval == 0) or (epoch == end_epoch):
             if (local_accuracy > best_acc_so_far):
                 # if acc is the best so far, update
-                best_acc_so_far = local_accuracy
+                best_acc_so_far = local_accuracy # validation acc; training acc variableis overwritten
                 es_counter = 0
 
                 # save checkpoint model
