@@ -201,7 +201,7 @@ class FGVC_aircraft():
             return len(self.test_img_label)
 
 class CompCars():
-    def __init__(self, input_size, root, is_train=True, data_len=100):
+    def __init__(self, input_size, root, is_train=True, data_len=None):
         self.input_size = input_size
         self.root = root
         self.is_train = is_train
