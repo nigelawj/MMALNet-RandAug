@@ -39,13 +39,16 @@ def main():
     #加载checkpoint
     save_path = os.path.join(model_path, model_name)
     # We will not use loading of checkpoint for CompCars k-folds
-    # if os.path.exists(save_path):
-    #     start_epoch, lr = auto_load_resume(model, save_path, status='train')
+    if os.path.exists(save_path):
+        pass
+        # start_epoch, lr = auto_load_resume(model, save_path, status='train')
     #     assert start_epoch < end_epoch
-    # else:
-    #     os.makedirs(save_path)
+    else:
+        os.makedirs(save_path)
     #     start_epoch = 0
     #     lr = init_lr
+    start_epoch = 0
+    lr = init_lr
 
     # define optimizers
     optimizer = torch.optim.SGD(parameters, lr=lr, momentum=0.9, weight_decay=weight_decay)
