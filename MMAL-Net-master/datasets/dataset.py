@@ -201,7 +201,7 @@ class FGVC_aircraft():
             return len(self.test_img_label)
 
 class CompCars():
-    def __init__(self, input_size, root, is_train=True, data_len=None):
+    def __init__(self, input_size, root, is_train=True, data_len=100):
         self.input_size = input_size
         self.root = root
         self.is_train = is_train
@@ -215,9 +215,11 @@ class CompCars():
         test_img_label = []
 
         for i in train_label_df.index:
-            train_img_label.append([Path(img_path, PureWindowsPath(train_label_df['img_path'][i])), int(train_label_df['make_code'][i])]) # make_code [0, 74]
+            train_img_label.append([Path(img_path, PureWindowsPath(train_label_df['img_path'][i])), int(train_label_df['model_code'][i])]) 
+            # make_code [0, 74]
+            # model_code [0, 430]
         for i in test_label_df.index:
-            test_img_label.append([Path(img_path, PureWindowsPath(test_label_df['img_path'][i])), int(test_label_df['make_code'][i])])
+            test_img_label.append([Path(img_path, PureWindowsPath(test_label_df['img_path'][i])), int(test_label_df['model_code'][i])])
 
         self.train_img_label = train_img_label[:data_len]
         self.test_img_label = test_img_label[:data_len]

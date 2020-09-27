@@ -14,7 +14,7 @@ eval_trainset = True  # Set true to get train accs
 save_interval = 1
 max_checkpoint_num = 5
 end_epoch = 200
-init_lr = 0.001
+init_lr = 0.0001
 lr_milestones = [60, 100]
 lr_decay_rate = 0.1
 weight_decay = 1e-4
@@ -22,7 +22,10 @@ stride = 32
 channels = 2048
 input_size = 448
 
-patience = 4
+num_folds = 5
+start_from_fold = 1 # Change this to the fold you wish to begin from; to be used when resuming training
+patience = 10
+patience_counter = 0
 
 # The pth path of pretrained model
 pretrain_path = './models/pretrained/resnet50-19c8e357.pth'
@@ -51,7 +54,7 @@ else:
     if set == 'CompCars':
         model_path = './checkpoint/CompCars'      # pth save path
         root = './datasets/CompCars'  # dataset path
-        num_classes = 75
+        num_classes = 431
     if set == 'CAR':
         model_path = './checkpoint/car'      # pth save path
         root = './datasets/Stanford_Cars'  # dataset path

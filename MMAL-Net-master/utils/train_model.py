@@ -15,12 +15,14 @@ def train(model,
           save_path,
           start_epoch,
           end_epoch,
+          patience_counter,
           save_interval):
 
     best_acc_so_far = 0 # local_accuracy
-    es_counter = 0
 
-    for epoch in range(start_epoch + 1, end_epoch + 1):
+    for epoch in range(1, end_epoch + 1):
+        if (epoch <= start_epoch): # to recreate the shuffling of data as per before training stopped
+            continue
         model.train()
 
         print('Epoch: %d' % epoch)
@@ -100,8 +102,8 @@ def train(model,
             # if (epoch % save_interval == 0) or (epoch == end_epoch):
             if (local_accuracy > best_acc_so_far):
                 # if acc is the best so far, update
-                best_acc_so_far = local_accuracy # validation acc; training acc variableis overwritten
-                es_counter = 0
+                best_acc_so_far = local_accuracy # validation acc; training acc variable is overwritten
+                patience_counter = 0
 
                 # save checkpoint model
                 print('Saving checkpoint')
@@ -109,12 +111,13 @@ def train(model,
                     'epoch': epoch,
                     'model_state_dict': model.state_dict(),
                     'learning_rate': lr,
+                    'patience_counter': patience_counter
                 }, os.path.join(save_path, 'epoch' + str(epoch) + '.pth'))
 
             else:
-                es_counter += 1
+                patience_counter += 1
             
-            if (es_counter > patience):
+            if (patience_counter > patience):
                 print(f'Early Stopping at epoch {epoch}.\n')
                 break
 

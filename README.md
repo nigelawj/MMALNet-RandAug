@@ -13,8 +13,9 @@ The experiment is performed on the CompCars dataset.
 - Ensure conda environment is activated: `conda activate ENV_NAME`
 - Install Python 3.7.x: `conda install python=3.7`
 - Install PyTorch and TorchVision via pytorch channel: `conda install pytorch torchvision -c pytorch`
-- Install other packages: `conda install numpy pandas tqdm pillow imageio scikit-image`
-- Install Tensorboard: `conda install tensorboardx -c conda-forge` 
+- Install other packages: `conda install numpy pandas tqdm pillow imageio scikit-learn scikit-image`
+- Install TensorboardX: `conda install tensorboardx -c conda-forge`
+- Install Tensorboard: `conda install tensorboard`
 - Install OpenCV: `conda install opencv`
 6. Run `python train.py` to commence training
 - Remember to set eval_trainset = True in `config.py`

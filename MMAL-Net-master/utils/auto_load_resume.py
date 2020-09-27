@@ -8,7 +8,7 @@ def auto_load_resume(model, path, status):
         pth_files = os.listdir(path)
         nums_epoch = [int(name.replace('epoch', '').replace('.pth', '')) for name in pth_files if '.pth' in name]
         if len(nums_epoch) == 0:
-            return 0, init_lr
+            return 0, init_lr, 0
         else:
             max_epoch = max(nums_epoch)
             pth_path = os.path.join(path, 'epoch' + str(max_epoch) + '.pth')
@@ -21,8 +21,9 @@ def auto_load_resume(model, path, status):
             model.load_state_dict(new_state_dict)
             epoch = checkpoint['epoch']
             lr = checkpoint['learning_rate']
+            patience_counter = checkpoint['patience_counter']
             print('Resume from %s' % pth_path)
-            return epoch, lr
+            return epoch, lr, patience_counter
     elif status == 'test':
         print('Load model from', path)
         checkpoint = torch.load(path, map_location='cpu')

@@ -6,17 +6,26 @@ import shutil
 import time
 from config import num_classes, model_name, model_path, lr_milestones, lr_decay_rate, input_size, \
     root, end_epoch, save_interval, init_lr, batch_size, CUDA_VISIBLE_DEVICES, weight_decay, \
-    proposalN, set, channels
+    proposalN, set, channels, num_folds, start_from_fold, patience_counter, patience
 from utils.train_model import train
 from utils.read_dataset import read_dataset
 from utils.auto_load_resume import auto_load_resume
 from networks.model import MainNet
 
-import os, sys
+import os, sys, random
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
 
 os.environ['CUDA_VISIBLE_DEVICES'] = CUDA_VISIBLE_DEVICES
+
+# Set seeds
+seed = 42
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+torch.manual_seed(seed)
+torch.cuda.manual_seed_all(seed)
+np.random.seed(seed)
+random.seed(seed)
 
 def main():
     #加载数据
@@ -36,19 +45,21 @@ def main():
 
     parameters = model.parameters()
 
-    #加载checkpoint
+    # Load checkpoint from a fold number
     save_path = os.path.join(model_path, model_name)
-    # We will not use loading of checkpoint for CompCars k-folds
     if os.path.exists(save_path):
-        pass
-        # start_epoch, lr = auto_load_resume(model, save_path, status='train')
-    #     assert start_epoch < end_epoch
+        load_model_from_path = os.path.join(save_path, f'fold_{start_from_fold}')
+        if not os.path.exists(load_model_from_path):
+            os.makedirs(load_model_from_path)
+        start_epoch, lr, patience_counter = auto_load_resume(model, load_model_from_path, status='train')
+        assert start_epoch < end_epoch, 'end of fold reached, please increment start_from_fold'
+        assert start_from_fold < num_folds
+        assert patience_counter <= patience
     else:
         os.makedirs(save_path)
-    #     start_epoch = 0
-    #     lr = init_lr
-    start_epoch = 0
-    lr = init_lr
+        start_epoch = 0
+        lr = init_lr
+        patience_counter = 0
 
     # define optimizers
     optimizer = torch.optim.SGD(parameters, lr=lr, momentum=0.9, weight_decay=weight_decay)
@@ -73,10 +84,13 @@ def main():
     X_train = np.array(X_train)
     y_train = np.array(y_train)
 
-    skf = StratifiedKFold(n_splits=5, random_state=42, shuffle=True)
+    skf = StratifiedKFold(n_splits=num_folds, random_state=seed, shuffle=True)
 
     for fold, (train_index, val_index) in enumerate(skf.split(X_train, y_train)):
         print(f'\n=============== Fold {fold+1} ==================')
+        if (fold+1 < start_from_fold):
+            print('Skipping this fold...\n')
+            continue
         # Prepare save_path for the fold
         save_path_fold = os.path.join(save_path, str(f'fold_{fold+1}'))
 
@@ -114,8 +128,10 @@ def main():
             save_path=save_path_fold,
             start_epoch=start_epoch,
             end_epoch=end_epoch,
+            patience_counter=patience_counter,
             save_interval=save_interval
         )
+        start_epoch = 0 # refresh start_epoch for next fold
 
         print(f'\n=============== End of fold {fold+1} ==================\n')
 
