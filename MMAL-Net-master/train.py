@@ -30,20 +30,10 @@ random.seed(seed)
 def main():
     #加载数据
     trainset, _, testset, _ = read_dataset(input_size, batch_size, root, set)
-    #image will be resize to the input_size
-    #batch size means the number of images the nn process before updating the weight and biases 
-    #root is the root to the dataset
-    #set is the dataset name (change in config)
-
-
-    #定义模型
-    model = MainNet(proposalN=proposalN, num_classes=num_classes, channels=channels)
-    
-
-    #设置训练参数
-    criterion = nn.CrossEntropyLoss()
-
-    parameters = model.parameters()
+    # image will be resize to the input_size
+    # batch size means the number of images the nn process before updating the weight and biases 
+    # root is the root to the dataset
+    # set is the dataset name (change in config)
 
     # Load checkpoint from a fold number
     save_path = os.path.join(model_path, model_name)
@@ -60,13 +50,6 @@ def main():
         start_epoch = 0
         lr = init_lr
         patience_counter = 0
-
-    # define optimizers
-    optimizer = torch.optim.SGD(parameters, lr=lr, momentum=0.9, weight_decay=weight_decay)
-
-    model = model.cuda()  # 部署在GPU
-
-    scheduler = MultiStepLR(optimizer, milestones=lr_milestones, gamma=lr_decay_rate)
 
     # 保存config参数信息
     time_str = time.strftime("%Y%m%d-%H%M%S")
@@ -117,6 +100,18 @@ def main():
         trainloader_fold = torch.utils.data.DataLoader(trainset_fold, batch_size=batch_size, shuffle=True, num_workers=8, drop_last=False)
         valloader_fold = torch.utils.data.DataLoader(valset_fold, batch_size=batch_size, shuffle=False, num_workers=8, drop_last=False)
 
+        # Create model
+        model = MainNet(proposalN=proposalN, num_classes=num_classes, channels=channels)
+        criterion = nn.CrossEntropyLoss()
+
+        # Define optimizers
+        parameters = model.parameters()
+        optimizer = torch.optim.SGD(parameters, lr=lr, momentum=0.9, weight_decay=weight_decay)
+
+        model = model.cuda()
+
+        scheduler = MultiStepLR(optimizer, milestones=lr_milestones, gamma=lr_decay_rate)
+
         # 开始训练
         train(
             model=model,
@@ -132,6 +127,9 @@ def main():
             save_interval=save_interval
         )
         start_epoch = 0 # refresh start_epoch for next fold
+        # Clear model and release GPU memory
+        del model
+        torch.cuda.empty_cache()
 
         print(f'\n=============== End of fold {fold+1} ==================\n')
 
