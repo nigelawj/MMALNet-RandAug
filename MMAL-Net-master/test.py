@@ -27,7 +27,7 @@ def main():
         root = './datasets/CompCars'  # dataset path
         # model path
         pth_path = "./models/epoch1.pth" # remember to change as per saved model's name
-        num_classes = 75
+        num_classes = 431
     elif set == 'Aircraft':
         root = './datasets/FGVC-aircraft'  # dataset path
         # model path
