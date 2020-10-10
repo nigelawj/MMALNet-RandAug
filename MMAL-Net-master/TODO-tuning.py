@@ -6,11 +6,11 @@ import shutil
 import time
 from config import num_classes, model_name, model_path, lr_milestones, lr_decay_rate, input_size, \
     root, end_epoch, save_interval, init_lr, batch_size, CUDA_VISIBLE_DEVICES, weight_decay, \
-    proposalN, set, channels, num_folds, start_from_fold, patience_counter, patience, multitask
-from utils.train_model import train, train_multitask
+    proposalN, set, channels, num_folds, start_from_fold, patience_counter, patience
+from utils.train_model import train
 from utils.read_dataset import read_dataset
 from utils.auto_load_resume import auto_load_resume
-from networks.model import MainNet, MainNetMultitask
+from networks.model import MainNet
 
 import os, sys, random
 import numpy as np
@@ -28,6 +28,7 @@ np.random.seed(seed)
 random.seed(seed)
 
 def main():
+    #加载数据
     trainset, _, testset, _ = read_dataset(input_size, batch_size, root, set)
     # image will be resize to the input_size
     # batch size means the number of images the nn process before updating the weight and biases 
@@ -50,11 +51,9 @@ def main():
         lr = init_lr
         patience_counter = 0
 
-    # save config
+    # 保存config参数信息
     time_str = time.strftime("%Y%m%d-%H%M%S")
     shutil.copy('./config.py', os.path.join(save_path, "{}config.py".format(time_str)))
-
-    print(f'Multitask: {multitask}')
 
     print('\nSplitting trainset into train and val sets (80:20)\nNote testset is loaded but unused, and will not be used unless test.py is run.')
     # NOTE: split train into train/val set; but for consistency of code we'll leave the variable names as 'test' instead of 'val'
@@ -102,11 +101,7 @@ def main():
         valloader_fold = torch.utils.data.DataLoader(valset_fold, batch_size=batch_size, shuffle=False, num_workers=8, drop_last=False)
 
         # Create model
-        if (multitask):
-            model = MainNetMultitask(proposalN=proposalN, num_classes=num_classes, channels=channels)
-        else:
-            model = MainNet(proposalN=proposalN, num_classes=num_classes, channels=channels)
-
+        model = MainNet(proposalN=proposalN, num_classes=num_classes, channels=channels)
         criterion = nn.CrossEntropyLoss()
 
         # Define optimizers
@@ -117,37 +112,21 @@ def main():
 
         scheduler = MultiStepLR(optimizer, milestones=lr_milestones, gamma=lr_decay_rate)
 
-        if (multitask):
-            train_multitask(
-                model=model,
-                trainloader=trainloader_fold,
-                testloader=valloader_fold,
-                criterion=criterion,
-                optimizer=optimizer,
-                scheduler=scheduler,
-                save_path=save_path_fold,
-                start_epoch=start_epoch,
-                end_epoch=end_epoch,
-                patience_counter=patience_counter,
-                save_interval=save_interval
-            )
-
-        else:
-            train(
-                model=model,
-                trainloader=trainloader_fold,
-                testloader=valloader_fold,
-                criterion=criterion,
-                optimizer=optimizer,
-                scheduler=scheduler,
-                save_path=save_path_fold,
-                start_epoch=start_epoch,
-                end_epoch=end_epoch,
-                patience_counter=patience_counter,
-                save_interval=save_interval
-            )
+        # 开始训练
+        train(
+            model=model,
+            trainloader=trainloader_fold,
+            testloader=valloader_fold,
+            criterion=criterion,
+            optimizer=optimizer,
+            scheduler=scheduler,
+            save_path=save_path_fold,
+            start_epoch=start_epoch,
+            end_epoch=end_epoch,
+            patience_counter=patience_counter,
+            save_interval=save_interval
+        )
         start_epoch = 0 # refresh start_epoch for next fold
-
         # Clear model and release GPU memory
         del model
         torch.cuda.empty_cache()

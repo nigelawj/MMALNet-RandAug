@@ -27,6 +27,8 @@ start_from_fold = 1 # Change this to the fold you wish to begin from; to be used
 patience = 10
 patience_counter = 0
 
+multitask = False
+
 # The pth path of pretrained model
 pretrain_path = './models/pretrained/resnet50-19c8e357.pth'
 
@@ -55,6 +57,9 @@ else:
         model_path = './checkpoint/CompCars'      # pth save path
         root = './datasets/CompCars'  # dataset path
         num_classes = 431
+        if (multitask):
+            num_classes = (431, 75)
+            assert isinstance(num_classes, tuple), "Multitask mode is enabled but num_classes is an integer; please pass in a tuple for multiple predictions."
     if set == 'CAR':
         model_path = './checkpoint/car'      # pth save path
         root = './datasets/Stanford_Cars'  # dataset path
