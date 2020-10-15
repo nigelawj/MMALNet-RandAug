@@ -40,6 +40,13 @@ def main():
         load_model_from_path = os.path.join(save_path, f'fold_{start_from_fold}')
         if not os.path.exists(load_model_from_path):
             os.makedirs(load_model_from_path)
+
+        # Create model
+        if (multitask):
+            model = MainNetMultitask(proposalN=proposalN, num_classes=num_classes, channels=channels)
+        else:
+            model = MainNet(proposalN=proposalN, num_classes=num_classes, channels=channels)
+        
         start_epoch, lr, patience_counter = auto_load_resume(model, load_model_from_path, status='train')
         assert start_epoch < end_epoch, 'end of fold reached, please increment start_from_fold'
         assert start_from_fold < num_folds
@@ -54,70 +61,71 @@ def main():
     time_str = time.strftime("%Y%m%d-%H%M%S")
     shutil.copy('./config.py', os.path.join(save_path, "{}config.py".format(time_str)))
 
-    print(f'Multitask: {multitask}')
-
     print('\nSplitting trainset into train and val sets (80:20)\nNote testset is loaded but unused, and will not be used unless test.py is run.')
     # NOTE: split train into train/val set; but for consistency of code we'll leave the variable names as 'test' instead of 'val'
     # split train set into train/val 80:20
     X_train = []
     y_train = []
+    
     for i, j in trainset.train_img_label:
         X_train.append(i)
         y_train.append(j)
+
     # convert lists into numpy arrays
     X_train = np.array(X_train)
     y_train = np.array(y_train)
 
     skf = StratifiedKFold(n_splits=num_folds, random_state=seed, shuffle=True)
+    
+    if (multitask):
+        # placeholder y_train with only the first element of the y tuples for when multitask learning is done to prevent stratified kfolds bug
+        y_train_temp = np.array([i[0] for i in y_train])
 
-    for fold, (train_index, val_index) in enumerate(skf.split(X_train, y_train)):
-        print(f'\n=============== Fold {fold+1} ==================')
-        if (fold+1 < start_from_fold):
-            print('Skipping this fold...\n')
-            continue
-        # Prepare save_path for the fold
-        save_path_fold = os.path.join(save_path, str(f'fold_{fold+1}'))
+        for fold, (train_index, val_index) in enumerate(skf.split(X_train, y_train_temp)):
+            print(f'Multitask: {multitask}')
+            print(f'\n=============== Fold {fold+1} ==================')
+            if (fold+1 < start_from_fold):
+                print('Skipping this fold...\n')
+                continue
+            # Prepare save_path for the fold
+            save_path_fold = os.path.join(save_path, str(f'fold_{fold+1}'))
 
-        # Split trainloader into train and val loaders
-        X_train_fold = X_train[train_index]
-        X_val_fold = X_train[val_index]
-        y_train_fold = y_train[train_index]
-        y_val_fold = y_train[val_index]
+            # Split trainloader into train and val loaders
+            X_train_fold = X_train[train_index]
+            X_val_fold = X_train[val_index]
+            y_train_fold = y_train[train_index]
+            y_val_fold = y_train[val_index]
 
-        # Zip back the X and y values
-        train_img_label_fold = list(zip(X_train_fold, y_train_fold))
-        val_img_label_fold = list(zip(X_val_fold, y_val_fold))
+            # Zip back the X and y values
+            train_img_label_fold = list(zip(X_train_fold, y_train_fold))
+            val_img_label_fold = list(zip(X_val_fold, y_val_fold))
 
-        # Hijack the original trainset with the X and y for the particular fold
-        trainset_fold = trainset
-        trainset_fold.train_img_label = train_img_label_fold
-        valset_fold = testset
-        valset_fold.test_img_label = val_img_label_fold # variable name kept as test_img_label for code consistency
+            # Hijack the original trainset with the X and y for the particular fold
+            trainset_fold = trainset
+            trainset_fold.train_img_label = train_img_label_fold
+            valset_fold = testset
+            valset_fold.test_img_label = val_img_label_fold # variable name kept as test_img_label for code consistency
 
-        print(f'Size of trainset: {len(trainset_fold)}')
-        print(f'Size of valset: {len(valset_fold)}')
-        
-        # Recreate DataLoaders with train and val sets
-        trainloader_fold = torch.utils.data.DataLoader(trainset_fold, batch_size=batch_size, shuffle=True, num_workers=8, drop_last=False)
-        valloader_fold = torch.utils.data.DataLoader(valset_fold, batch_size=batch_size, shuffle=False, num_workers=8, drop_last=False)
+            print(f'Size of trainset: {len(trainset_fold)}')
+            print(f'Size of valset: {len(valset_fold)}')
+            
+            # Recreate DataLoaders with train and val sets
+            trainloader_fold = torch.utils.data.DataLoader(trainset_fold, batch_size=batch_size, shuffle=True, num_workers=8, drop_last=False)
+            valloader_fold = torch.utils.data.DataLoader(valset_fold, batch_size=batch_size, shuffle=False, num_workers=8, drop_last=False)
 
-        # Create model
-        if (multitask):
+            # Create model
             model = MainNetMultitask(proposalN=proposalN, num_classes=num_classes, channels=channels)
-        else:
-            model = MainNet(proposalN=proposalN, num_classes=num_classes, channels=channels)
 
-        criterion = nn.CrossEntropyLoss()
+            criterion = nn.CrossEntropyLoss()
 
-        # Define optimizers
-        parameters = model.parameters()
-        optimizer = torch.optim.SGD(parameters, lr=lr, momentum=0.9, weight_decay=weight_decay)
+            # Define optimizers
+            parameters = model.parameters()
+            optimizer = torch.optim.SGD(parameters, lr=lr, momentum=0.9, weight_decay=weight_decay)
 
-        model = model.cuda()
+            model = model.cuda()
 
-        scheduler = MultiStepLR(optimizer, milestones=lr_milestones, gamma=lr_decay_rate)
+            scheduler = MultiStepLR(optimizer, milestones=lr_milestones, gamma=lr_decay_rate)
 
-        if (multitask):
             train_multitask(
                 model=model,
                 trainloader=trainloader_fold,
@@ -132,7 +140,60 @@ def main():
                 save_interval=save_interval
             )
 
-        else:
+            start_epoch = 0 # refresh start_epoch for next fold
+
+            # Clear model and release GPU memory
+            del model
+            torch.cuda.empty_cache()
+
+            print(f'\n=============== End of fold {fold+1} ==================\n')
+
+    else:
+        for fold, (train_index, val_index) in enumerate(skf.split(X_train, y_train)):
+            print(f'Multitask: {multitask}')
+            print(f'\n=============== Fold {fold+1} ==================')
+            if (fold+1 < start_from_fold):
+                print('Skipping this fold...\n')
+                continue
+            # Prepare save_path for the fold
+            save_path_fold = os.path.join(save_path, str(f'fold_{fold+1}'))
+
+            # Split trainloader into train and val loaders
+            X_train_fold = X_train[train_index]
+            X_val_fold = X_train[val_index]
+            y_train_fold = y_train[train_index]
+            y_val_fold = y_train[val_index]
+
+            # Zip back the X and y values
+            train_img_label_fold = list(zip(X_train_fold, y_train_fold))
+            val_img_label_fold = list(zip(X_val_fold, y_val_fold))
+
+            # Hijack the original trainset with the X and y for the particular fold
+            trainset_fold = trainset
+            trainset_fold.train_img_label = train_img_label_fold
+            valset_fold = testset
+            valset_fold.test_img_label = val_img_label_fold # variable name kept as test_img_label for code consistency
+
+            print(f'Size of trainset: {len(trainset_fold)}')
+            print(f'Size of valset: {len(valset_fold)}')
+            
+            # Recreate DataLoaders with train and val sets
+            trainloader_fold = torch.utils.data.DataLoader(trainset_fold, batch_size=batch_size, shuffle=True, num_workers=8, drop_last=False)
+            valloader_fold = torch.utils.data.DataLoader(valset_fold, batch_size=batch_size, shuffle=False, num_workers=8, drop_last=False)
+
+            # Create model
+            model = MainNet(proposalN=proposalN, num_classes=num_classes, channels=channels)
+
+            criterion = nn.CrossEntropyLoss()
+
+            # Define optimizers
+            parameters = model.parameters()
+            optimizer = torch.optim.SGD(parameters, lr=lr, momentum=0.9, weight_decay=weight_decay)
+
+            model = model.cuda()
+
+            scheduler = MultiStepLR(optimizer, milestones=lr_milestones, gamma=lr_decay_rate)
+
             train(
                 model=model,
                 trainloader=trainloader_fold,
@@ -146,14 +207,14 @@ def main():
                 patience_counter=patience_counter,
                 save_interval=save_interval
             )
-        start_epoch = 0 # refresh start_epoch for next fold
 
-        # Clear model and release GPU memory
-        del model
-        torch.cuda.empty_cache()
+            start_epoch = 0 # refresh start_epoch for next fold
 
-        print(f'\n=============== End of fold {fold+1} ==================\n')
+            # Clear model and release GPU memory
+            del model
+            torch.cuda.empty_cache()
 
+            print(f'\n=============== End of fold {fold+1} ==================\n')
 
 if __name__ == '__main__':
     main()

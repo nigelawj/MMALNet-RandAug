@@ -132,13 +132,13 @@ class MainNet(nn.Module):
 class MainNetMultitask(nn.Module):
     def __init__(self, proposalN, num_classes, channels):
         # nn.Module子类的函数必须在构造函数中执行父类的构造函数
-        super(MainNet, self).__init__()
+        super(MainNetMultitask, self).__init__()
         self.num_classes_1 = num_classes[0]
         self.num_classes_2 = num_classes[1]
         self.proposalN = proposalN
         self.pretrained_model = resnet.resnet50(pretrained=True, pth_path=pretrain_path)
-        self.rawcls_net_1 = nn.Linear(channels, num_classes)
-        self.rawcls_net_2 = nn.Linear(channels, num_classes)
+        self.rawcls_net_1 = nn.Linear(channels, num_classes[0])
+        self.rawcls_net_2 = nn.Linear(channels, num_classes[1])
         self.APPM = APPM()
 
     def forward(self, x, epoch, batch_idx, status='test', DEVICE='cuda'):

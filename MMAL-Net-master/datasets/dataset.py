@@ -218,10 +218,10 @@ class CompCars():
 
         if (multitask and isinstance(num_classes, tuple)):
             for i in train_label_df.index:
-                train_img_label.append([Path(img_path, PureWindowsPath(train_label_df['img_path'][i])), (int(train_label_df['model_code'][i]), int(train_label_df['model_code'][i]))]) 
+                train_img_label.append([Path(img_path, PureWindowsPath(train_label_df['img_path'][i])), (int(train_label_df['model_code'][i]), int(train_label_df['make_code'][i]))]) 
                 
             for i in test_label_df.index:
-                test_img_label.append([Path(img_path, PureWindowsPath(test_label_df['img_path'][i])), (int(test_label_df['model_code'][i]), int(test_label_df['model_code'][i]))])
+                test_img_label.append([Path(img_path, PureWindowsPath(test_label_df['img_path'][i])), (int(test_label_df['model_code'][i]), int(test_label_df['make_code'][i]))])
 
         # model_code [0, 430] -> 431
         elif (num_classes == 431):

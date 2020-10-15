@@ -31,6 +31,7 @@ def main():
         if (multitask):
             num_classes = (431, 75)
             assert isinstance(num_classes, tuple), "Multitask mode is enabled but num_classes is an integer; please pass in a tuple for multiple predictions."
+            assert num_classes[0] == 431, "Please put the number of car models (431) as the first element of the tuple"
     elif set == 'Aircraft':
         root = './datasets/FGVC-aircraft'  # dataset path
         # model path

@@ -3,7 +3,7 @@ import glob
 import torch
 from tqdm import tqdm
 from tensorboardX import SummaryWriter
-from config import max_checkpoint_num, proposalN, eval_trainset, set, patience
+from config import max_checkpoint_num, proposalN, eval_trainset, set, patience, multitask
 from utils.eval_model import eval, eval_multitask
 
 def train(model,
@@ -25,6 +25,7 @@ def train(model,
             continue
         model.train()
 
+        print(f'Multitask: {multitask}')
         print('Epoch: %d' % epoch)
 
         lr = next(iter(optimizer.param_groups))['lr']
@@ -141,7 +142,7 @@ def train_multitask(model,
           patience_counter,
           save_interval):
 
-    best_acc_so_far = 0 # local_accuracy
+    best_acc_so_far = 0 # local_accuracy_1
 
     for epoch in range(1, end_epoch + 1):
         if (epoch <= start_epoch): # to recreate the shuffling of data as per before training stopped
@@ -157,19 +158,24 @@ def train_multitask(model,
                 images, labels, _, _ = data
             else:
                 images, labels = data
-            images, labels = images.cuda(), labels.long().cuda()
+
+            labels_1, labels_2 = torch.split(labels, 1, dim=1)
+            labels_1 = torch.flatten(labels_1)
+            labels_2 = torch.flatten(labels_2)
+
+            images, labels_1, labels_2 = images.cuda(), labels_1.long().cuda(), labels_2.long().cuda()
 
             optimizer.zero_grad()
 
             proposalN_windows_score, proposalN_windows_logits_1, proposalN_windows_logits_2, indices, \
             window_scores, _, raw_logits_1, raw_logits_2, local_logits_1, local_logits_2, _ = model(images, epoch, i, 'train')
 
-            raw_loss_1 = criterion(raw_logits_1, labels[0])
-            raw_loss_2 = criterion(raw_logits_2, labels[1])
-            local_loss_1 = criterion(local_logits_1, labels[0])
-            local_loss_2 = criterion(local_logits_2, labels[1])
-            windowscls_loss_1 = criterion(proposalN_windows_logits_1, labels.unsqueeze(1).repeat(1, proposalN).view(-1))
-            windowscls_loss_2 = criterion(proposalN_windows_logits_2, labels.unsqueeze(1).repeat(1, proposalN).view(-1))
+            raw_loss_1 = criterion(raw_logits_1, labels_1)
+            raw_loss_2 = criterion(raw_logits_2, labels_2)
+            local_loss_1 = criterion(local_logits_1, labels_1)
+            local_loss_2 = criterion(local_logits_2, labels_2)
+            windowscls_loss_1 = criterion(proposalN_windows_logits_1, labels_1.unsqueeze(1).repeat(1, proposalN).view(-1))
+            windowscls_loss_2 = criterion(proposalN_windows_logits_2, labels_2.unsqueeze(1).repeat(1, proposalN).view(-1))
 
             if epoch < 2:
                 total_loss = raw_loss_1 + raw_loss_2
@@ -230,9 +236,9 @@ def train_multitask(model,
         else:
             # save checkpoint only if its the best model so far
             # if (epoch % save_interval == 0) or (epoch == end_epoch):
-            if (local_accuracy > best_acc_so_far):
+            if (local_accuracy_1 > best_acc_so_far):
                 # if acc is the best so far, update
-                best_acc_so_far = local_accuracy # validation acc; training acc variable is overwritten
+                best_acc_so_far = local_accuracy_1 # validation acc; training acc variable is overwritten
                 patience_counter = 0
 
                 # save checkpoint model

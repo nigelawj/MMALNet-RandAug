@@ -132,20 +132,26 @@ def eval_multitask(model, testloader, criterion, status, save_path, epoch):
                 images, labels, boxes, scale = data
             else:
                 images, labels = data
+
+            labels_1, labels_2 = torch.split(labels, 1, dim=1)
+            labels_1 = torch.flatten(labels_1)
+            labels_2 = torch.flatten(labels_2)
+
             images = images.cuda()
-            labels = labels.long().cuda()
+            labels_1 = labels_1.long().cuda()
+            labels_2 = labels_2.long().cuda()
 
             proposalN_windows_score, proposalN_windows_logits_1, proposalN_windows_logits_2, indices, \
             window_scores, coordinates, raw_logits_1, raw_logits_2, local_logits_1, local_logits_2, local_imgs = model(images, epoch, i, status)
 
-            raw_loss_1 = criterion(raw_logits_1, labels[0])
-            raw_loss_2 = criterion(raw_logits_2, labels[1])
-            local_loss_1 = criterion(local_logits_1, labels[0])
-            local_loss_2 = criterion(local_logits_2, labels[1])
-            windowscls_loss_1 = criterion(proposalN_windows_logits_1, labels.unsqueeze(1).repeat(1, proposalN).view(-1))
-            windowscls_loss_2 = criterion(proposalN_windows_logits_2, labels.unsqueeze(1).repeat(1, proposalN).view(-1))
+            raw_loss_1 = criterion(raw_logits_1, labels_1)
+            raw_loss_2 = criterion(raw_logits_2, labels_2)
+            local_loss_1 = criterion(local_logits_1, labels_1)
+            local_loss_2 = criterion(local_logits_2, labels_2)
+            windowscls_loss_1 = criterion(proposalN_windows_logits_1, labels_1.unsqueeze(1).repeat(1, proposalN).view(-1))
+            windowscls_loss_2 = criterion(proposalN_windows_logits_2, labels_2.unsqueeze(1).repeat(1, proposalN).view(-1))
 
-            total_loss = raw_loss_1, raw_loss_2 + local_loss_1, local_loss_2 + windowscls_loss_1 + windowscls_loss_2
+            total_loss = raw_loss_1 + raw_loss_2 + local_loss_1 + local_loss_2 + windowscls_loss_1 + windowscls_loss_2
 
             raw_loss_sum_1 += raw_loss_1.item()
             raw_loss_sum_2 += raw_loss_2.item()
@@ -172,13 +178,13 @@ def eval_multitask(model, testloader, criterion, status, save_path, epoch):
             # raw
             pred_1 = raw_logits_1.max(1, keepdim=True)[1]
             pred_2 = raw_logits_2.max(1, keepdim=True)[1]
-            raw_correct_1 += pred_1.eq(labels.view_as(pred_1)).sum().item()
-            raw_correct_2 += pred_2.eq(labels.view_as(pred_2)).sum().item()
+            raw_correct_1 += pred_1.eq(labels_1.view_as(pred_1)).sum().item()
+            raw_correct_2 += pred_2.eq(labels_2.view_as(pred_2)).sum().item()
             # local
             pred_1 = local_logits_1.max(1, keepdim=True)[1]
             pred_2 = local_logits_2.max(1, keepdim=True)[1]
-            local_correct_1 += pred_1.eq(labels.view_as(pred_1)).sum().item()
-            local_correct_2 += pred_2.eq(labels.view_as(pred_2)).sum().item()
+            local_correct_1 += pred_1.eq(labels_1.view_as(pred_1)).sum().item()
+            local_correct_2 += pred_2.eq(labels_2.view_as(pred_2)).sum().item()
 
             # raw branch tensorboard
             if i == 0:
