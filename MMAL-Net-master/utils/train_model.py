@@ -117,9 +117,11 @@ def train(model,
 
             else:
                 patience_counter += 1
+
+            print(f'Patience counter: {patience_counter}')
             
             if (patience_counter > patience):
-                print(f'Early Stopping at epoch {epoch}.\n')
+                print(f'Early Stopping at epoch {epoch}; hit patience {patience_counter}\n')
                 break
 
         # Limit the number of checkpoints to less than or equal to max_checkpoint_num,
