@@ -7,6 +7,7 @@ For assessing the project, please refer to the sections on `Installing Dependenc
 
 ### Installing Dependencies
 Instructions for setting up the required conda environment (pip can be used as well):
+
 	- Create a conda environment: `conda create --name ENV_NAME`
 	- Ensure conda environment is activated: `conda activate ENV_NAME`
 	- Install Python 3.7.x: `conda install python=3.7`
@@ -16,7 +17,7 @@ Instructions for setting up the required conda environment (pip can be used as w
 	- Install Tensorboard: `conda install tensorboard`
 	- Install OpenCV: `conda install opencv`
 
-### Running MMALNet for Fine Tuning
+### Running MMALNet for Fine Tuning`num_classes`
 This section is not required for testing the model but indicates the workflow used during training
 1. Download the [pretrained model of ResNet-50](https://download.pytorch.org/models/resnet50-19c8e357.pth) and move it to `models/pretrained`
 	- Other ResNets like ResNet-152 can also be used if desired
