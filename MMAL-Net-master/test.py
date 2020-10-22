@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import sys
 from tqdm import tqdm
-from config import input_size, root, proposalN, channels, multitask
+from config import input_size, root, proposalN, channels
 from utils.read_dataset import read_dataset
 from utils.auto_load_resume import auto_load_resume
 from networks.model import MainNet, MainNetMultitask
@@ -16,8 +16,9 @@ def main():
     CUDA = torch.cuda.is_available()
     DEVICE = torch.device("cuda" if CUDA else "cpu")
 
-    # dataset
-    set = 'CompCars'
+    set = 'CompCars' # ensure dataset is set properly
+    multitask = True
+    
     if set == 'CUB':
         root = './datasets/CUB_200_2011'  # dataset path
         # model path
@@ -26,7 +27,7 @@ def main():
     elif set == 'CompCars':
         root = './datasets/CompCars'  # dataset path
         # model path
-        pth_path = "./models/epoch1.pth" # remember to change as per saved model's name
+        pth_path = "./models/multitask_epoch79.pth" # remember to change as per saved model's name
         num_classes = 431
         if (multitask):
             num_classes = (431, 75)
