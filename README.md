@@ -7,15 +7,14 @@ For assessing the project, please refer to the sections on `Installing Dependenc
 
 ### Installing Dependencies
 Instructions for setting up the required conda environment (pip can be used as well):
-
-	- Create a conda environment: `conda create --name ENV_NAME`
-	- Ensure conda environment is activated: `conda activate ENV_NAME`
-	- Install Python 3.7.x: `conda install python=3.7`
-	- Install PyTorch and TorchVision via pytorch channel: `conda install pytorch torchvision -c pytorch`
-	- Install other packages: `conda install numpy pandas tqdm pillow imageio scikit-learn scikit-image`
-	- Install TensorboardX: `conda install tensorboardx -c conda-forge`
-	- Install Tensorboard: `conda install tensorboard`
-	- Install OpenCV: `conda install opencv`
+- Create a conda environment: `conda create --name ENV_NAME`
+- Ensure conda environment is activated: `conda activate ENV_NAME`
+- Install Python 3.7.x: `conda install python=3.7`
+- Install PyTorch and TorchVision via pytorch channel: `conda install pytorch torchvision -c pytorch`
+- Install other packages: `conda install numpy pandas tqdm pillow imageio scikit-learn scikit-image`
+- Install TensorboardX: `conda install tensorboardx -c conda-forge`
+- Install Tensorboard: `conda install tensorboard`
+- Install OpenCV: `conda install opencv`
 
 ### Running MMALNet for Fine Tuning`num_classes`
 This section is not required for testing the model but indicates the workflow used during training
