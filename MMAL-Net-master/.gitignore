@@ -1,10 +1,8 @@
-models/pretrained/*.pth
-datasets/CUB_200_2011/images/*/
-models/*.pth
 .idea
 *.DS_Store
 *__init__.py
 *__pycache__
-weimin_debug.py
 
-checkpoint*/
+models/pretrained/*.pth
+datasets/CUB_200_2011/images/*/
+models/*.pth

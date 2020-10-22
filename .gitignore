@@ -5,6 +5,8 @@ misc/
 part/
 train_test_split/
 ckpt/
+weimin_debug.py
+checkpoint*/
 
 .vscode/
 
