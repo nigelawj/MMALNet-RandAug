@@ -5,7 +5,7 @@ import numpy as np
 CUDA_VISIBLE_DEVICES = '0'  # The current version only supports one GPU training
 
 
-set = 'CompCars'  # Different dataset with different
+set = 'CompCars'  # Change dataset
 model_name = ''
 
 batch_size = 6
@@ -22,12 +22,20 @@ stride = 32
 channels = 2048
 input_size = 448
 
-num_folds = 5
-start_from_fold = 1 # Change this to the fold you wish to begin from; to be used when resuming training
-patience = 10
-patience_counter = 0
+num_folds = 5 # set the number of folds for stratified K-folds cross validation
 
-multitask = True
+# Change this to the fold you wish to begin from; to be used when resuming training.
+# NOTE: that this value may cause unexpected behaviour if improperly set
+# e.g. if you wish to resume training from fold 2 (i.e. stopped training at fold 2), then set start_from_fold=2
+start_from_fold = 1 
+
+# Patience values; training stops if specified number of epochs elapsed without an improvement in specified metric
+# Specified metric for our purposes on CompCars dataset is the local_accuracy metric
+patience = 10 
+
+patience_counter = 0 # Initialise to 0
+
+multitask = True # flag to indicate if multitask learning is to be used; must also change num_classes accordingly
 
 # The pth path of pretrained model
 pretrain_path = './models/pretrained/resnet50-19c8e357.pth'
