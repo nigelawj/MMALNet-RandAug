@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import sys
 from tqdm import tqdm
-from config import input_size, root, proposalN, channels
+from config import input_size, root, proposalN, channels, multitask
 from utils.read_dataset import read_dataset
 from utils.auto_load_resume import auto_load_resume
 from networks.model import MainNet, MainNetMultitask
@@ -17,7 +17,6 @@ def main():
     DEVICE = torch.device("cuda" if CUDA else "cpu")
 
     set = 'CompCars' # ensure dataset is set properly
-    multitask = True
     
     if set == 'CUB':
         root = './datasets/CUB_200_2011'  # dataset path
@@ -72,13 +71,18 @@ def main():
                 else:
                     x, y = data
                 x = x.to(DEVICE)
-                y = y.to(DEVICE)
+
+                y_1, y_2 = y[0], y[1]
+
+                y_1 = y_1.to(DEVICE)
+                y_2 = y_2.to(DEVICE)
+
                 local_logits_1, local_logits_2, local_imgs = model(x, epoch, i, 'test', DEVICE)[-3:]
                 # local
                 pred_1 = local_logits_1.max(1, keepdim=True)[1]
                 pred_2 = local_logits_2.max(1, keepdim=True)[1]
-                object_correct_1 += pred_1.eq(y.view_as(pred_1)).sum().item()
-                object_correct_2 += pred_2.eq(y.view_as(pred_2)).sum().item()
+                object_correct_1 += pred_1.eq(y_1.view_as(pred_1)).sum().item()
+                object_correct_2 += pred_2.eq(y_2.view_as(pred_2)).sum().item()
 
             print('\nObject branch accuracy for task 1: {}/{} ({:.2f}%)\n'.format(object_correct_1, len(testloader.dataset), 100. * object_correct_1 / len(testloader.dataset)))
             print('\nObject branch accuracy for task 2: {}/{} ({:.2f}%)\n'.format(object_correct_2, len(testloader.dataset), 100. * object_correct_2 / len(testloader.dataset)))

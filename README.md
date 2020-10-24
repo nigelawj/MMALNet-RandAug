@@ -61,7 +61,8 @@ This section is not required for testing the model but indicates the workflow us
 	- Ensure `set` variable is `CompCars`, for properly assessing our saved model trained on the `CompCars` dataset
 	
 	- Ensure `num_classes` and `multitask` variables is set accordingly:
-		- For `CompCars` dataset:
+		- `multitask` parameter must be changed (True/False) in `config.py`
+		- For setting `num_classes` on the `CompCars` dataset:
 			- Predict `car_make` - set `num_classes` to 75 and set `multitask` to False
 			- Predict `car_model` - set `num_classes` to 431 and set `multitask` to False
 			- Multi-Task Learning on both `car_model` and `car_make` - set `num_classes` to a tuple of (431, 75) which is of the format (`car_model`, `car_make`), and set `multitask` to True
