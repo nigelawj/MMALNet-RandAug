@@ -23,6 +23,7 @@ def auto_load_resume(model, path, status):
             lr = checkpoint['learning_rate']
             patience_counter = checkpoint['patience_counter']
             print('Resume from %s' % pth_path)
+            print(f'Patience Counter was: {patience_counter}')
             return epoch, lr, patience_counter
     elif status == 'test':
         print('Load model from', path)

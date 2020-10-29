@@ -26,7 +26,7 @@ def train(model,
         model.train()
 
         print(f'Multitask: {multitask}')
-        print('Epoch: %d' % epoch)
+        print(f'Epoch: {epoch}, patience counter: {patience_counter}')
 
         lr = next(iter(optimizer.param_groups))['lr']
 
@@ -100,11 +100,9 @@ def train(model,
             pass
         else:
             # save checkpoint only if its the best model so far
-            # if (epoch % save_interval == 0) or (epoch == end_epoch):
             if (local_accuracy > best_acc_so_far):
                 # if acc is the best so far, update
                 best_acc_so_far = local_accuracy # validation acc; training acc variable is overwritten
-                patience_counter = 0
 
                 # save checkpoint model
                 print('Saving checkpoint')
@@ -114,6 +112,8 @@ def train(model,
                     'learning_rate': lr,
                     'patience_counter': patience_counter
                 }, os.path.join(save_path, 'epoch' + str(epoch) + '.pth'))
+                
+                patience_counter = 0
 
             else:
                 patience_counter += 1
@@ -151,7 +151,8 @@ def train_multitask(model,
             continue
         model.train()
 
-        print('Epoch: %d' % epoch)
+        print(f'Multitask: {multitask}')
+        print(f'Epoch: {epoch}, patience counter: {patience_counter}')
 
         lr = next(iter(optimizer.param_groups))['lr']
 
@@ -237,11 +238,9 @@ def train_multitask(model,
             pass
         else:
             # save checkpoint only if its the best model so far
-            # if (epoch % save_interval == 0) or (epoch == end_epoch):
             if (local_accuracy_1 > best_acc_so_far):
                 # if acc is the best so far, update
                 best_acc_so_far = local_accuracy_1 # validation acc; training acc variable is overwritten
-                patience_counter = 0
 
                 # save checkpoint model
                 print('Saving checkpoint')
@@ -251,9 +250,12 @@ def train_multitask(model,
                     'learning_rate': lr,
                     'patience_counter': patience_counter
                 }, os.path.join(save_path, 'epoch' + str(epoch) + '.pth'))
+                patience_counter = 0
 
             else:
                 patience_counter += 1
+
+            print(f'Patience counter: {patience_counter}')
             
             if (patience_counter > patience):
                 print(f'Early Stopping at epoch {epoch}.\n')
