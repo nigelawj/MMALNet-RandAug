@@ -6,7 +6,7 @@ import shutil
 import time
 from config import num_classes, model_name, model_path, lr_milestones, lr_decay_rate, input_size, \
     root, end_epoch, save_interval, init_lr, batch_size, CUDA_VISIBLE_DEVICES, weight_decay, \
-    proposalN, set, channels, num_folds, start_from_fold, patience_counter, patience, multitask
+    proposalN, set, channels, num_folds, start_from_fold, patience_counter, patience, multitask, rand_aug, N, M
 from utils.train_model import train, train_multitask
 from utils.read_dataset import read_dataset
 from utils.auto_load_resume import auto_load_resume
@@ -48,6 +48,7 @@ def main():
             model = MainNet(proposalN=proposalN, num_classes=num_classes, channels=channels)
         
         start_epoch, lr, patience_counter = auto_load_resume(model, load_model_from_path, status='train')
+        print(f'Patience counter starting from: {patience_counter}')
         assert start_epoch < end_epoch, 'end of fold reached, please increment start_from_fold'
         assert start_from_fold < num_folds
         assert patience_counter <= patience
@@ -83,6 +84,9 @@ def main():
 
         for fold, (train_index, val_index) in enumerate(skf.split(X_train, y_train_temp)):
             print(f'Multitask: {multitask}')
+            print(f'Random Augmentation: {rand_aug}')
+            if (rand_aug):
+                print(f'N:{N} M: {M}')
             print(f'\n=============== Fold {fold+1} ==================')
             if (fold+1 < start_from_fold):
                 print('Skipping this fold...\n')

@@ -15,6 +15,10 @@ Instructions for setting up the required conda environment (pip can be used as w
 - Install TensorboardX: `conda install tensorboardx -c conda-forge`
 - Install Tensorboard: `conda install tensorboard`
 - Install OpenCV: `conda install opencv`
+- Install RandAug: `pip install git+https://github.com/ildoonet/pytorch-randaugment`
+	- This package must be installed via `pip`
+	- To install this package without git+, download the repo and simply install the downloaded .zip file: `pip install <zipfile name>.zip`
+	- More details on RandAug can be found in this [paper](https://arxiv.org/abs/1909.13719)
 
 ### Running MMALNet for Fine Tuning`num_classes`
 This section is not required for testing the model but indicates the workflow used during training
@@ -36,6 +40,9 @@ This section is not required for testing the model but indicates the workflow us
 		- If no training metrics are desired, set to `False` to save training time
 	- `set`
 		- Set to `CompCars` to load CompCars dataset; Can be set to other datasets like CUB200, etc.
+	- `rand_aug`
+		- Set to `True` if RandAug (Random Augmentation) is to be used for training, else set to `False`
+		- Does not affect testing as RandAug is not used in testing phase.
 	- `num_folds`
 		- Set the number of folds for stratified K-folds cross validation
 	- `start_from_fold`
@@ -67,11 +74,11 @@ This section is not required for testing the model but indicates the workflow us
 			- Predict `car_model` - set `num_classes` to 431 and set `multitask` to False
 			- Multi-Task Learning on both `car_model` and `car_make` - set `num_classes` to a tuple of (431, 75) which is of the format (`car_model`, `car_make`), and set `multitask` to True
 			
-	- Download the desired trained model provided [here]() and place the model in the location indicated by `pth_path` (i.e. `./models`)
+	- Download the desired trained model provided and place the model in the location indicated by `pth_path` (i.e. `./models`)
 		- The available saved models are from training to predict:
-			- `car_make` only
-			- `car_model` only
-			- Multi-Task learning on both `car_make` and `car_model` attributes
+			- `car_make` only: LINK
+			- `car_model` only: LINK
+			- Multi-Task learning on both `car_make` and `car_model` attributes: LINK
 			
 		- The model filename indicates the epoch that the model with the best `local_accuracy` was saved at
 			- Early Stopping was performed on the `local_accuracy` metric of the `MMALNet` during training

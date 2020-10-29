@@ -10,7 +10,7 @@ model_name = ''
 
 batch_size = 6
 vis_num = batch_size  # The number of visualized images in tensorboard
-eval_trainset = True  # Set true to get train accs
+eval_trainset = False  # Set true to get train accs
 save_interval = 1
 max_checkpoint_num = 5
 end_epoch = 200
@@ -36,6 +36,10 @@ patience = 10
 patience_counter = 0 # Initialise to 0
 
 multitask = True # flag to indicate if multitask learning is to be used; must also change num_classes accordingly
+
+rand_aug = True # flag to indicate if RandAugment should be used
+N = 1 # no. of augmentation transformations to apply sequentially [1, 2, 3]
+M = 5 # magnitude for all the transformations [5, 7, 9, 11, 13, 15]
 
 # The pth path of pretrained model
 pretrain_path = './models/pretrained/resnet50-19c8e357.pth'

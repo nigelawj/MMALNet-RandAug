@@ -8,7 +8,8 @@ import torch
 import pandas as pd
 from pathlib import Path, PureWindowsPath
 
-from config import num_classes, multitask
+from config import num_classes, multitask, rand_aug, N, M
+from RandAugment import RandAugment
 
 class CUB():
     def __init__(self, input_size, root, is_train=True, data_len=None):
@@ -250,6 +251,8 @@ class CompCars():
             img = Image.fromarray(img, mode='RGB')
 
             img = transforms.Resize((self.input_size, self.input_size), Image.BILINEAR)(img)
+            if (rand_aug):
+                img = RandAugment(N, M)(img)
             # img = transforms.RandomResizedCrop(size=self.input_size,scale=(0.4, 0.75),ratio=(0.5,1.5))(img)
             # img = transforms.RandomCrop(self.input_size)(img)
             img = transforms.RandomHorizontalFlip()(img)
