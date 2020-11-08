@@ -26,7 +26,7 @@ def main():
     elif set == 'CompCars':
         root = './datasets/CompCars'  # dataset path
         # model path
-        pth_path = "./models/multitask_epoch79.pth" # remember to change as per saved model's name
+        pth_path = "./models/multitask_randaug_epoch68.pth" # remember to change as per saved model's name
         num_classes = 431
         if (multitask):
             num_classes = (431, 75)

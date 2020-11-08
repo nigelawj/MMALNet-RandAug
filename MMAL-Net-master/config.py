@@ -12,7 +12,7 @@ batch_size = 6
 vis_num = batch_size  # The number of visualized images in tensorboard
 eval_trainset = False  # Set true to get train accs
 save_interval = 1
-max_checkpoint_num = 5
+max_checkpoint_num = 1
 end_epoch = 200
 init_lr = 0.001
 lr_milestones = [60, 100]
@@ -29,7 +29,7 @@ num_folds = 5 # set the number of folds for stratified K-folds cross validation
 # e.g. if you wish to resume training from fold 2 (i.e. stopped training at fold 2), then set start_from_fold=2
 start_from_fold = 1 
 
-# Patience values; training stops if specified number of epochs elapsed without an improvement in specified metric
+# Patience values; training stops if more than the specified number of epochs elapsed without an improvement in specified metric
 # Specified metric for our purposes on CompCars dataset is the local_accuracy metric
 patience = 10 
 
@@ -39,7 +39,7 @@ multitask = True # flag to indicate if multitask learning is to be used; must al
 
 rand_aug = True # flag to indicate if RandAugment should be used
 N = 1 # no. of augmentation transformations to apply sequentially [1, 2, 3]
-M = 5 # magnitude for all the transformations [5, 7, 9, 11, 13, 15]
+M = 15 # magnitude for all the transformations [5, 7, 9, 11, 13, 15]
 
 # The pth path of pretrained model
 pretrain_path = './models/pretrained/resnet50-19c8e357.pth'
