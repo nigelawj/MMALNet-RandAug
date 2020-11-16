@@ -44,12 +44,12 @@ This section is not required for testing the model but indicates the workflow us
 		- Set to `True` if RandAug (Random Augmentation) is to be used for training, else set to `False`
 		- Does not affect testing as RandAug is not used in testing phase.
 	- `num_folds`
-		- Set the number of folds for stratified K-folds cross validation
+		- Set the number of folds for Stratified K-Folds cross validation
 	- `start_from_fold`
 		- Change this to the fold you wish to begin from; to be used when resuming training.
 		- NOTE: that this value may cause unexpected behaviour if improperly set; e.g. if you wish to resume training from fold 2 (i.e. stopped training at fold 2), then set `start_from_fold=2`
 	- `patience`
-		- Training stops if specified number of epochs elapsed without an improvement in specified metric
+		- Training stops if more than the specified number of epochs elapsed without an improvement in specified metric
 		- Specified metric for our purposes on CompCars dataset is the local_accuracy metric
 	- `patience_counter`
 		- This should be initialised to 0
@@ -59,9 +59,14 @@ This section is not required for testing the model but indicates the workflow us
 			- Predict `car_model` - set to 431
 			- Multi-Task Learning on both `car_model` and `car_make` - set to a tuple of (431, 75), with (`car_model`, `car_make`)
 	
-5. Run `python train.py` to commence training
+5. Run `python tuning.py` to commence training
+	- Train dataset will be split into training and validation sets (80:20), and Stratified K-Folds is performed for k=5
+		- To be used for hyperparameter tuning or evaluating model modifications
 	- During training, the `tensorboardx` log file and epoch checkpoints will be saved in their respective folds' directories
 	- `tensorboardx` log files can be viewed via `tensorboard`
+	
+6. Run `python train.py` to train finalised model
+	- Training and testing will be performed on the original (50:50) data split
 
 ### Testing MMALNet
 1. Ensure variables are set properly in `test.py`
@@ -79,6 +84,7 @@ This section is not required for testing the model but indicates the workflow us
 			- `car_make` only: LINK
 			- `car_model` only: LINK
 			- Multi-Task learning on both `car_make` and `car_model` attributes: LINK
+			- `car_model` with `RandAug` (N:1, M:15): LINK
 			
 		- The model filename indicates the epoch that the model with the best `local_accuracy` was saved at
 			- Early Stopping was performed on the `local_accuracy` metric of the `MMALNet` during training
@@ -88,4 +94,5 @@ This section is not required for testing the model but indicates the workflow us
 		- e.g. if trained model filename is `multitask_epoch1.pth`, then ensure `pth_path` properly reflects the saved model's filename: `./models/multitask_epoch1.pth`
 		
 2. Run `python test.py` to test the model
+	- NOTE: the testloader should be modified to contain only unseen data for accurate evaluation of model accuracy
 	- For cases where GPU memory is insufficient: lower `batch_size`
