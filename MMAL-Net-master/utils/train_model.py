@@ -78,7 +78,6 @@ def train(model,
                 writer.add_scalar('Train/total_loss_avg', total_loss_avg, epoch)
 
         # eval testset
-        print('\nFriendly reminder that \'test\' set in this case means val set. The real test set is unused and only used in test.py')
         raw_loss_avg, windowscls_loss_avg, total_loss_avg, raw_accuracy, local_accuracy, \
         local_loss_avg\
             = eval(model, testloader, criterion, 'test', save_path, epoch)
@@ -214,7 +213,6 @@ def train_multitask(model,
                 writer.add_scalar('Train/total_loss_avg', total_loss_avg, epoch)
 
         # eval testset
-        print('\nFriendly reminder that \'test\' set in this case means val set. The real test set is unused and only used in test.py')
         raw_loss_avg_1, raw_loss_avg_2, windowscls_loss_avg_1, windowscls_loss_avg_2, total_loss_avg, raw_accuracy_1, raw_accuracy_2, local_accuracy_1, local_accuracy_2, local_loss_avg_1, local_loss_avg_2 = eval_multitask(model, testloader, criterion, 'test', save_path, epoch)
 
         print('Test set: raw accuracy_1: {:.2f}%, local accuracy_1: {:.2f}%'.format(100. * raw_accuracy_1, 100. * local_accuracy_1))

@@ -35,7 +35,7 @@ patience = 10
 
 patience_counter = 0 # Initialise to 0
 
-multitask = True # flag to indicate if multitask learning is to be used; must also change num_classes accordingly
+multitask = False # flag to indicate if multitask learning is to be used; must also change num_classes accordingly
 
 rand_aug = True # flag to indicate if RandAugment should be used
 N = 1 # no. of augmentation transformations to apply sequentially [1, 2, 3]
