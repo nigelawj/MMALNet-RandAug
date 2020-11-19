@@ -30,6 +30,8 @@ Instructions for setting up the required conda environment (pip can be used as w
 		- OR extract `data.zip`, and move the 5 folders out from the `data` folder that is extracted
 	- The 5 folders: `image`, `label`, `misc`, `part` and `train_test_split` should reside in the same directory as `data.csv` and `prepare-data_csv.ipynb`
 
+![compcars-files](./compcars-files.jpg)
+
 ### Running MMALNet for Fine Tuning
 This section is not required for testing the model but indicates the workflow used during training
 1. Download the [pretrained model of ResNet-50](https://download.pytorch.org/models/resnet50-19c8e357.pth) and move it to `models/pretrained`
@@ -107,3 +109,10 @@ This section is not required for testing the model but indicates the workflow us
 
 4. `test.py`
 	- Runs a test on a trained model via the 14939 test images from the original CompCars train test split
+	
+5. Files in `randaug_hyp_tuning_parsers`
+	- Files used in parsing the tensorboard logs for hyperparameter tuning on RandAugment parameters N and M
+	
+6. `datasets/CompCars/prepare-data_csv.ipynb`
+	- Notebook used to prepare the image paths and information of the car (number of doors, car model, car make, etc.)
+	- Outputs `data.csv`
