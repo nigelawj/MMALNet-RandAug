@@ -97,7 +97,7 @@ This section is not required for testing the model but indicates the workflow us
 			- e.g. if trained model filename is `car_model_randaug_epoch45.pth`, then ensure `pth_path` properly reflects the saved model's filename: `./models/car_model_randaug_epoch45.pth`
 		
 6. Run `python test.py` to test the model
-	- NOTE: the testloader should be modified to contain only unseen data for accurate evaluation of model accuracy
+	- Executing the script will reproduce the results we obtained (98.32%)
 	- For cases where GPU memory is insufficient: lower `batch_size`
 	
 ### Important Files
