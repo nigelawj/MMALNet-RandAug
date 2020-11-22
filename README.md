@@ -3,7 +3,7 @@ This project is a modification of the original [MMALNet](https://arxiv.org/abs/2
 
 The experiment is performed on the CompCars dataset.
 
-For assessing the project, please refer to the sections on `Installing Dependencies`, `Downloading the CompCars Dataset` and `Testing MMALNet`.
+For assessing the project, please refer to the sections on `Installing Dependencies`, `Downloading the CompCars Dataset`, `Downloading the pretrained ResNet-50 model` and `Testing MMALNet`.
 Please also refer to `Important Files` for a brief description of the main files in the repository.
 
 ### Installing Dependencies
@@ -32,17 +32,18 @@ Instructions for setting up the required conda environment (pip can be used as w
 
 ![compcars-files](./compcars-files.jpg)
 
-### Running MMALNet for Fine Tuning
-This section is not required for testing the model but indicates the workflow used during training
+### Downloading the pretrained ResNet-50 model
 1. Download the [pretrained model of ResNet-50](https://download.pytorch.org/models/resnet50-19c8e357.pth) and move it to `models/pretrained`
 	- Ensure `pretrain_path` variable in `config.py` is set to point to the pretrained ResNet model path
 	- Other ResNets like ResNet-152 can also be used if desired
-	
-2. For cases where GPU memory is insufficient: tweak `N_list`, or lower `batch_size`, these parameters can be found in `config.py`
+
+### Running MMALNet for Fine Tuning
+This section is not required for testing the model but indicates the workflow used during training
+1. For cases where GPU memory is insufficient: tweak `N_list`, or lower `batch_size`, these parameters can be found in `config.py`
 	- The parameter N_list is N1, N2, N3 in the [original paper](https://arxiv.org/pdf/2003.09150v3.pdf) and you can adjust them according to GPU memory
 	- batch_size can be lowered to 3 or below
 		
-3. Ensure `config.py` variables are set properly
+2. Ensure `config.py` variables are set properly
 	- `eval_trainset`
 		- This is to allow evaluation metrics to be obtained for the training
 		- If no training metrics are desired, set to `False` to save training time
@@ -67,29 +68,36 @@ This section is not required for testing the model but indicates the workflow us
 			- Predict `car_make` - set to 75
 			- Multi-Task Learning on both `car_model` and `car_make` - set to a tuple of (431, 75), with (`car_model`, `car_make`)
 	
-4. Run `python tuning.py` to commence training
+3. Run `python tuning.py` to commence training
 	- Train dataset will be split into training and validation sets (80:20), and Stratified K-Folds is performed for k=5
 		- To be used for hyperparameter tuning or evaluating model modifications
 	- During training, the `tensorboardx` log file and epoch checkpoints will be saved in their respective folds' directories
 	- `tensorboardx` log files can be viewed via `tensorboard`
 	
-5. Run `python train.py` to train finalised model
+4. Run `python train.py` to train finalised model
 	- Training and testing will be performed on the original (50:50) data split
 
 ### Testing MMALNet
 1. Ensure `num_classes` and `multitask` variables is set accordingly for testing our saved model trained with `RandAugment` without Multi-Task Learning:
-		- Set `num_classes` to 431 and `multitask` to False in `config.py`
+	- Set `num_classes` to 431 and `multitask` to False in `config.py`
+	
 2. Ensure variables are set properly in `test.py`
 	- Ensure `set` variable is set to `CompCars`, for properly assessing our saved model trained on the `CompCars` dataset
-	- Download the trained model provided and place the `.pth` file in the location indicated by `pth_path` (i.e. `./models`)
-		- The available saved models are from training to predict:
-			- `car_model` with `RandAug` (N:1, M:15): https://drive.google.com/file/d/110d8qEYI6LGtDV_S9H1IrdAK6SiAs4Zy/view?usp=sharing
-			- The model filename indicates the epoch that the model with the best `local_accuracy` was saved at
-			- Ensure that the `pth_path` variable in `test.py` points to the location of the downloaded saved model
-				- e.g. if trained model filename is `car_model_randaug_epoch45.pth`, then ensure `pth_path` properly reflects the saved model's filename: `./models/car_model_randaug_epoch45.pth`
+
+3. The above variables should be already configured as such in the repository.
+
+4. Ensure the ResNet-50 model is already placed at the appropriate location: `models/pretrained`
+	- Ensure that the `pretrain_path` variable is also pointing to the ResNet-50 model's path.
+
+5. Download the trained model provided and place the `.pth` file in the location indicated by `pth_path` (i.e. `./models`)
+	- The available saved models are from training to predict:
+		- `car_model` trained with `RandAug` (N:1, M:15) on the original train test split for CompCars: https://drive.google.com/file/d/110d8qEYI6LGtDV_S9H1IrdAK6SiAs4Zy/view?usp=sharing
+		- The model filename indicates the epoch that the model with the best `local_accuracy` was saved at
+		- Ensure that the `pth_path` variable in `test.py` points to the location of the downloaded saved model
+			- e.g. if trained model filename is `car_model_randaug_epoch45.pth`, then ensure `pth_path` properly reflects the saved model's filename: `./models/car_model_randaug_epoch45.pth`
 		
-3. Run `python test.py` to test the model
-	- NOTE: the testloader should be modified to contain only unseen data for accurate evaluation of model accuracy
+6. Run `python test.py` to test the model
+	- Executing the script will reproduce the results we obtained (98.32%)
 	- For cases where GPU memory is insufficient: lower `batch_size`
 	
 ### Important Files
